@@ -2,7 +2,8 @@ import math
 import pandas as pd
 import numpy as np
 
-from matplotlib import pyplot
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 from scipy import interpolate
 from scipy.signal import savgol_filter
 from scipy.optimize import curve_fit
@@ -24,34 +25,43 @@ for i, dr in enumerate(drs):
         else:
             results[well[i+7]] = {'x': [cycles[i+7]], 'y': [dr]}
 
-print(results)
 
 # getting x and y from xls file
 x = np.array(results['A1']['x'])
 y = np.array(results['A1']['y'])
 
-# interpolate + smooth
-f = interpolate.interp1d(x, y, kind="linear")
-x_int = np.linspace(x[0], x[-1], 1000)
-window_size, poly_order = 201, 3
-y_int = savgol_filter(f(x_int), window_size, poly_order)
 
-
-# or fit to a global function
+# fit to a global function
 def func(x, A, B, x0, sigma):
     return A+B*np.tanh((x-x0)/sigma)
 
 
+x_int = np.linspace(x[0], x[-1], 1000)
 fit, _ = curve_fit(func, x, y)
 y_fit = func(x_int, *fit)
+
 
 # derivative
 der = np.diff(y_fit) / np.diff(x_int)
 x2 = (x_int[:-1] + x_int[1:]) / 2
+max_fit = max(zip(x2, der), key=lambda t: t[1])
 
-pyplot.plot(x, y, 'r.', label='amplification data')
-pyplot.plot(x_int, y_int, 'k', label="Smoothed curve")
-pyplot.plot(x_int, y_fit, 'b--', label=r"$f(x) = A + B \tanh\left(\frac{x-x_0}{\sigma}\right)$")
-pyplot.plot(x2, der)
-pyplot.legend(loc='best')
-pyplot.show()
+fig = plt.figure()
+ax1 = fig.add_subplot(211)
+ax1.set_xlabel('cycle')
+ax1.set_ylabel(r'${\Delta}Rn$')
+ax1.xaxis.set_major_locator(ticker.MultipleLocator(5))
+ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+ax1.plot(x, y, 'r.', label='amplification data')
+ax1.plot(x_int, y_fit, 'b--', label=r"$f(x) = A + B \tanh\left(\frac{x-x_0}{\sigma}\right)$")
+ax1.legend(loc='upper left')
+
+ax2 = fig.add_subplot(212)
+ax2.set_xlabel('cycle')
+ax2.set_ylabel(r"${\Delta}Rn$'")
+ax2.xaxis.set_major_locator(ticker.MultipleLocator(5))
+ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+ax2.plot(x2, der, label=f'first derivative, maximum in {round(max_fit[0], 2)}')
+ax2.legend(loc='upper left')
+
+plt.show()
