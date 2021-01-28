@@ -58,19 +58,26 @@ def plot_std_curve(std_curve_data: dict):
     A = np.vstack([x, np.ones(len(x))]).T
     m, c = np.linalg.lstsq(A, y, rcond=None)[0]
 
-    E = (10**(1/(-m))-1)*100
+    mx = np.mean(x)
+    my = np.mean(y)
+
+    covx = np.mean((x-mx)**2)
+    covy = np.mean((y-my)**2)
+
+    E = (10**(1/np.abs(m))-1)*100
+    dE = 10**(1/np.abs(m))*np.log(10)/m**2 * np.sqrt(1/(len(x)-2)*(covy/covx-m**2))*200
 
     plt.plot(x, y, 'b.')
     plt.plot(x, m * x + c, 'r', label=f'Fitted line: y={round(m, 2)}*x+{round(c, 2)}')
-    plt.title(f"Эффективность E = {round(E, 1)} %")
+    plt.title(f"Эффективность E = {round(E, 1)}" + r"${\pm}$" + f"{round(dE, 1)} %")
     plt.xlabel('log(conc)')
     plt.ylabel("Ct")
     plt.legend()
     plt.savefig(join("results", "std_curve.png"), bbox_inches='tight')
 
-
+# st BLA1 data
 std_data = {
-    "conc": [1, 10, 100, 1000, 1, 1],
-    "cts": [10, 14.1, 18.5, 23, 11, 10.5]
+    "conc": [10, 10, 1, 1, 1/10, 1/10, 1/100, 1/100, 1e-03, 1e-03, 1e-04, 1e-04, 1e-05, 1e-05, 1e-06, 1e-06],
+    "cts": [12.707,12.928,15.401,15.854,19.434,19.443,23.635,23.632,26.985,26.949,31.618,31.57,32.797,34.331,34.953,34.009]
 }
 # plot_std_curve(std_data)
