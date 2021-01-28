@@ -1,3 +1,4 @@
+import math
 from os.path import join
 
 import numpy as np
@@ -46,4 +47,30 @@ def fit_data(name: str, x: list, y: list) -> float:
 
     plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9, hspace=0.3)
     plt.savefig(join("results", name + ".png"), bbox_inches='tight')
+    plt.close()
     return ct
+
+
+def plot_std_curve(std_curve_data: dict):
+    x = np.log10(np.array(std_curve_data["conc"]))
+    y = np.array(std_curve_data["cts"])
+
+    A = np.vstack([x, np.ones(len(x))]).T
+    m, c = np.linalg.lstsq(A, y, rcond=None)[0]
+
+    E = (10**(1/(-m))-1)*100
+
+    plt.plot(x, y, 'b.')
+    plt.plot(x, m * x + c, 'r', label=f'Fitted line: y={round(m, 2)}*x+{round(c, 2)}')
+    plt.title(f"Эффективность E = {round(E, 1)} %")
+    plt.xlabel('log(conc)')
+    plt.ylabel("Ct")
+    plt.legend()
+    plt.savefig(join("results", "std_curve.png"), bbox_inches='tight')
+
+
+std_data = {
+    "conc": [1, 10, 100, 1000, 1, 1],
+    "cts": [10, 14.1, 18.5, 23, 11, 10.5]
+}
+# plot_std_curve(std_data)

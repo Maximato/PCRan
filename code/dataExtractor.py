@@ -6,8 +6,10 @@ def extract_config() -> dict:
     xls = pd.ExcelFile('config.xls')
     sheet = xls.parse(0)
     annealing_filename = sheet["filename"][0]
+    method = sheet["method"][0]
     wells = sheet["wells"]
-    return {"annealing_filename": annealing_filename, "wells": wells}
+    conc = sheet["conc"]
+    return {"annealing_filename": annealing_filename, "method": method, "wells": wells, "conc": conc}
 
 
 def extract_data(filename: str) -> dict:
