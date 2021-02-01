@@ -1,27 +1,36 @@
 from os import listdir, remove
 from os.path import join
+import logging
 
-from code.dataExtractor import extract_config, extract_data
-from code.prosessor import fit_data, plot_std_curve
+logging.basicConfig(filename='.log', filemode='w', level=logging.ERROR)
 
-config = extract_config()
-annealing_filename, wells, conc = config["annealing_filename"], config["wells"], config["conc"]
 
-data = extract_data(annealing_filename)
+try:
+    from code.dataExtractor import extract_config, extract_data
+    from code.prosessor import fit_data, plot_std_curve
 
-# clear old results
-for file in listdir("results"):
-    remove(join("results", file))
+    config = extract_config()
 
-# run process
-std_curve_data = {"conc": [], "cts": []}
-with open(join("results", "cts.txt"), "w") as f:
-    f.write("well\tct\n")
-    for well, c in zip(wells, conc):
-        ct = fit_data(well, data[well]['x'], data[well]['y'])
-        std_curve_data["conc"].append(c)
-        std_curve_data["cts"].append(ct)
-        f.write(f"{well}\t{ct}\n")
+    # well extracting
+    data = extract_data(config["annealing_filename"])
 
-# plot standard curve
-plot_std_curve(std_curve_data)
+    # clear old results
+    for file in listdir("results"):
+        remove(join("results", file))
+
+    # ct calculations process
+    std_curve_data = {config["x_name"]: [], "cts": []}
+    with open(join("results", "cts.txt"), "w") as f:
+        f.write("well\tct\n")
+        for well, xp in zip(config["wells"], config["x"]):
+            ct = fit_data(well, data[well]['x'], data[well]['y'])
+            std_curve_data[config["x_name"]].append(xp)
+            std_curve_data["cts"].append(ct)
+            f.write(f"{well}\t{ct}\n")
+
+    # plot standard curve
+    plot_std_curve(std_curve_data, config["x_name"], method=config["method"], log_x=config["need_log_x"],
+                   eff=config["need_eff"])
+
+except Exception as e:
+    logging.exception("Exception occurred")

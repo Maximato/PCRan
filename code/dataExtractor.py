@@ -5,11 +5,13 @@ import pandas as pd
 def extract_config() -> dict:
     xls = pd.ExcelFile('config.xls')
     sheet = xls.parse(0)
-    annealing_filename = sheet["filename"][0]
-    method = sheet["method"][0]
-    wells = sheet["wells"]
-    conc = sheet["conc"]
-    return {"annealing_filename": annealing_filename, "method": method, "wells": wells, "conc": conc}
+    return {"annealing_filename": sheet["filename"][0],
+            "method": str(sheet["method"][0]),
+            "wells": sheet["wells"],
+            "x": sheet["x"],
+            "x_name": sheet["x_name"][0],
+            "need_log_x": bool(sheet["need_log_x"][0]),
+            "need_eff": bool(sheet["need_eff"][0])}
 
 
 def extract_data(filename: str) -> dict:
