@@ -7,6 +7,9 @@ def extract_config() -> dict:
     sheet = xls.parse(0)
     return {"annealing_filename": sheet["filename"][0],
             "method": str(sheet["method"][0]),
+            "y_axes": str(sheet["y_axes"][0]),
+            "detection": str(sheet["detection"][0]),
+            "threshold": sheet["threshold"][0],
             "wells": sheet["wells"],
             "x": sheet["x"],
             "x_name": sheet["x_name"][0],
