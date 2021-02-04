@@ -10,11 +10,13 @@ def extract_config() -> dict:
             "y_axes": str(sheet["y_axes"][0]),
             "detection": str(sheet["detection"][0]),
             "threshold": sheet["threshold"][0],
-            "wells": sheet["wells"],
+            "wells": [well for well in sheet["wells"] if str(well) != "nan"],
             "x": sheet["x"],
             "x_name": sheet["x_name"][0],
             "need_log_x": bool(sheet["need_log_x"][0]),
-            "need_eff": bool(sheet["need_eff"][0])}
+            "need_eff": bool(sheet["need_eff"][0]),
+            "pmod": str(sheet["pmod"][0])
+            }
 
 
 def extract_data(filename: str) -> dict:
