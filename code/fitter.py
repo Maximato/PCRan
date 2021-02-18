@@ -2,15 +2,21 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 
-class NoSuchMethodException(BaseException):
+class NoSuchMethodException(Exception):
     pass
 
 
-class NotSupportedMethodForThisDataException(BaseException):
+class NotSupportedMethodForThisDataException(Exception):
     pass
 
 
-def s_shaped_fit(x: list, y: list) -> (float, float):
+def s_shaped_fit(x: list, y: list) -> (list, list):
+    """
+    Fit data by function of the sigmoid family (hyperbolic tangent)
+    :param x: x data
+    :param y: y data
+    :return: fitted function points
+    """
     x, y = np.array(x), np.array(y)
 
     x_fit = np.linspace(x[0], x[-1], 1000)
@@ -20,6 +26,14 @@ def s_shaped_fit(x: list, y: list) -> (float, float):
 
 
 def linear_fit(x, y, method='lsq'):
+    """
+    Fit data by linear function
+    :param x: x data
+    :param y: y data
+    :param method: method of fitting ('lsq' or 'hi2')
+    :return: approximation parameters
+    """
+
     # MLS (least square)
     if method == "lsq":
         param_approx = _least_square_approximation(x, y)
@@ -32,7 +46,13 @@ def linear_fit(x, y, method='lsq'):
 
 
 def _least_square_approximation(x, y):
-    title = 'Метод наименьших квадратов'
+    """
+    Fit data by least square method
+    :param x: x data
+    :param y: y data
+    :return: approximation parameters
+    """
+    title = 'Least square method'
     err = None
     mx = np.mean(x)
     my = np.mean(y)
@@ -49,7 +69,13 @@ def _least_square_approximation(x, y):
 
 
 def _hi2_approximation(x, y):
-    title = 'Хи 2 метод'
+    """
+    Fit data by chi2 method
+    :param x: x data
+    :param y: y data
+    :return: approximation parameters
+    """
+    title = 'Chi 2 method'
     points = _get_unique_points(x, y)
     x = np.array(points['x'])
     y = np.array(points['y'])
@@ -71,12 +97,18 @@ def _hi2_approximation(x, y):
     return title, x, y, err, alpha, beta, dalpha, dbeta
 
 
-# fit to a global function
 def _func(x, A, B, x0, sigma):
+    # Function of the sigmoid family (hyperbolic tangent)
     return A + B * np.tanh((x - x0) / sigma)
 
 
 def _get_unique_points(x, y) -> dict:
+    """
+    Extracting unique points from data and calculation of errors. Need for 'hi2' method
+    :param x: x data
+    :param y: y data
+    :return: unique points {'x': list, 'y': list, 'err': list}
+    """
     combine = dict()
     for xp, yp in zip(x, y):
         if xp not in combine:
@@ -92,5 +124,11 @@ def _get_unique_points(x, y) -> dict:
     return points
 
 
-def _wmean(x, weights):
-    return sum(x * weights) / sum(weights)
+def _wmean(data, weights) -> float:
+    """
+    Calculation of weighted average
+    :param data: data for weighted averaging
+    :param weights: weights
+    :return: weighted average of data
+    """
+    return sum(data * weights) / sum(weights)

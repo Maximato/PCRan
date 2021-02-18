@@ -2,7 +2,6 @@ from os.path import join
 
 import numpy as np
 import matplotlib.pyplot as plt
-
 import matplotlib.ticker as ticker
 
 
@@ -20,12 +19,12 @@ def plot_linear_approximation(title: str, x, y, err, alpha: float, beta: float, 
         dE = 10 ** (1 / np.abs(alpha)) * np.log(10) / alpha ** 2 * dalpha * 100
         bottom, top = plt.ylim()
         left, right = plt.xlim()
-        text = f"Эффективность\nE = {round(E, 1)}" + r"${\pm}$" + f"{round(dE, 1)} %"
+        text = f"Efficiency\nE = {round(E, 1)}" + r"${\pm}$" + f"{round(dE, 1)} %"
         plt.text(left + (right - left) / 30, bottom + (top - bottom) / 30, text)
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.savefig(join("results", "std_curve.png"), bbox_inches='tight', dpi=150)
+    plt.savefig(join("results", "linear_fit.png"), bbox_inches='tight', dpi=150)
 
 
 def create_subplots_figure(x, detection, threshold):
@@ -65,13 +64,15 @@ def plot_single(name, x, y, x_fit, y_fit, x_der, der, ct, df, detection, thresho
     save_subplots_figure(name)
 
 
-def add_plot(figure, name, x, y, x_fit, y_fit, x_der, der):
+def add_plot(figure, label, color_code, x, y, x_fit, y_fit, x_der, der):
+    color = tuple(plt.cm.Spectral(color_code))
+
     ax1, ax2 = figure.get_axes()
-    ax1.plot(x, y, '.', markersize=3, label=name)
-    ax1.plot(x_fit, y_fit, '--')
+    ax1.plot(x, y, 'o', markersize=3, markeredgewidth=0.5, markerfacecolor=color, markeredgecolor=color)
+    ax1.plot(x_fit, y_fit, color=color, label=label)
     ax1.legend()
 
-    ax2.plot(x_der, der, label=f'{name} first derivative')
+    ax2.plot(x_der, der, color=color, label=label)
     new_top = max(der) + max(der) * 0.2
 
     if new_top > ax2.get_ylim()[1]:
