@@ -1,6 +1,6 @@
 # PCRan
 
-## About
+### About
 The PCRan program is designed to process raw PCR thermocycler data, downloaded in `.xls` format or fit prepared PCR data in `.txt` format by line (standard line).
 
 ## Running
@@ -36,8 +36,8 @@ You can run PCRan with pre-prepared data located in "static\test_data". Set para
 - `x_name` --- **conc**
 - `need_log_x` --- **True**
 - `need_eff` --- **True**
-- `wells` --- A1, B1, C1, A2, B2, C2, A3, B3, C3 (in column)
-- `x` --- 10000, 10000, 10000, 100, 100, 100, 1, 1, 1 (in column)
+- `wells` --- **A1, B1, C1, A2, B2, C2, A3, B3, C3 (in column)**
+- `x` --- **10000, 10000, 10000, 100, 100, 100, 1, 1, 1 (in column)**
 - `detection` --- **threshold**
 - `threshold` --- **5000**
 - `pmod` --- **multiplot**
