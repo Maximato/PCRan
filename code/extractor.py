@@ -7,7 +7,7 @@ def extract_config() -> dict:
     Extract configuration parameters from .xls file for running program
     :return: configuration parameters as dict
     """
-    xls = pd.ExcelFile('config.xls')
+    xls = pd.ExcelFile('config.xlsx')
     sheet = xls.parse(0)
     return {"filename": sheet["filename"][0],
             "mode": sheet["mode"][0],

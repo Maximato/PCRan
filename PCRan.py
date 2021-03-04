@@ -19,7 +19,7 @@ try:
 
     config = extract_config()
 
-    if config["mode"] == "rampl":
+    if config["mode"] in ["rampl", "all"]:
         # well extracting
         data = extract_raw_data(config["filename"])
 
@@ -37,8 +37,9 @@ try:
         raise AttributeError(f"Unsupported mode: {config['mode']}")
 
     # plot linear fit
-    linear_fit_data_process(line_fit_data, method=config["method"],
-                            log_x=config["need_log_x"], eff=config["need_eff"])
+    if config["mode"] in ["lfd", "all"]:
+        linear_fit_data_process(line_fit_data, method=config["method"],
+                                log_x=config["need_log_x"], eff=config["need_eff"])
 
 except Exception as e:
     logging.exception("Exception occurred")

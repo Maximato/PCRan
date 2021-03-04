@@ -6,13 +6,17 @@ The PCRan program is designed to process raw PCR thermocycler data, downloaded i
 ## Running
 To run the program PCRan you need to install the libraries `pandas`, `matplotlib` and `scipy`, set the necessary parameters in **config.xls** file and run **PCRan.py** script. All results are saved to a folder **results**.
 
-PCRan work in two modes: `rampl` and `lfd`.
-- `rampl` is analyze raw amplification data from PCR thermocycler in the `.xls` format. This data is stored as three columns (`Well` -- well ID, `Cycle` -- cycle of amplification, `dRn` -- fluorescence on the current cycle). In this mode PCRan plot amplification curves, calculate Ct for each well, fit this data by line and plot results.
+PCRan work in three modes: `rampl`, `lfd` and `all`.
+- `rampl` is analyze raw amplification data from PCR thermocycler in the `.xls` format. This data is stored as three columns (`Well` -- well ID, `Cycle` -- cycle of amplification, `dRn` -- fluorescence on the current cycle). In this mode PCRan plot amplification curves, calculate Ct for each well and save results.
 - `lfd` mode is needed to fit by line the prepared data which are specified in the `.txt` file. This data is stored as two columns: where the first column refers to `x` and the second to `y`. In this mode PCRan plot only results of liner fit.
+- `all` mode combine both `rampl` and `lfd`. In the mode program takes raw amplification data (`.xls` format), analyze it like in `rampl` mode and then process linear fitting like in `lfd` mode.
 
 Parameters in **config.xls**:
 - `filename` --- the name of the file to use as data
 - `mode` --- the type of data the file `filename` contains (`rampl` or `lfd`)
+- `detection` --- method for determining the point at which a signal is detected (`threshold` or `linear`)
+- `threshold` --- number greater than 0, ignored for `linear` detection
+- `pmod` --- plotting of amplification signals (`singleplot` or `multiplot`)
 - `method` --- linear fit method (`lsq` or `hi2`)
 - `y_name` --- the name of the values used as `y` for linear fit (`ct`, `drfu` or another)
 - `x_name` --- the name of the values used as `x` for linear fit
@@ -20,17 +24,16 @@ Parameters in **config.xls**:
 - `need_eff` --- need efficiency calculation
 - `wells` --- well IDs whose `ct` or `drfu` is used as `y` when constructing a straight line
 - `x` --- values used as `x` for linear fit
-- `detection` --- method for determining the point at which a signal is detected (`threshold` or `linear`)
-- `threshold` --- number greater than 0, ignored for `linear` detection
-- `pmod` --- plotting of amplification signals (`singleplot` or `multiplot`)
-
 
 You can run PCRan with pre-prepared data located in "static\test_data". Set parameters in **config.xls** according to `Example 1` or `Example 2` and run program.
 
 ### Example 1
 
 - `filename` --- **static/test_data/ampl.xls**
-- `mode` --- **rampl**
+- `mode` --- **all**
+- `detection` --- **threshold**
+- `threshold` --- **5000**
+- `pmod` --- **multiplot**
 - `method` --- **hi2**
 - `y_name` --- **ct**
 - `x_name` --- **conc**
@@ -38,14 +41,14 @@ You can run PCRan with pre-prepared data located in "static\test_data". Set para
 - `need_eff` --- **True**
 - `wells` --- **A1, B1, C1, A2, B2, C2, A3, B3, C3 (in column)**
 - `x` --- **10000, 10000, 10000, 100, 100, 100, 1, 1, 1 (in column)**
-- `detection` --- **threshold**
-- `threshold` --- **5000**
-- `pmod` --- **multiplot**
 
 ### Example 2
 
 - `filename` --- **static/test_data/conc-ct.txt**
 - `mode` --- **lfd**
+- `detection` --- *irrelevant*
+- `threshold` --- *irrelevant*
+- `pmod` --- *irrelevant*
 - `method` --- **lsq**
 - `y_name` --- **y**
 - `x_name` --- **x**
@@ -53,9 +56,7 @@ You can run PCRan with pre-prepared data located in "static\test_data". Set para
 - `need_eff` --- **False**
 - `wells` --- *irrelevant*
 - `x` --- *irrelevant*
-- `detection` --- *irrelevant*
-- `threshold` --- *irrelevant*
-- `pmod` --- *irrelevant*
+
 
 ## Implementation
 ### Amplification data approximation
@@ -126,6 +127,15 @@ Where:
 - E is the efficiency
 - α is the slope coefficient of the straight line
 - ∆α is the error in estimating the slope angle coefficient of the straight line
+
+### Calculation of concentrations by Ct
+The known coefficients of the standard straight line make it possible to calculate the concentration of the sample from the known values of the threshold cycles. It should be borne in mind that in this case the same methods for determining Ct should be used both when constructing a standard straight line (estimating the coefficients α and β) and when determining the threshold cycle Ct of a sample.
+
+![formula](https://render.githubusercontent.com/render/math?math=E=10^\frac{C_t-\beta}{\alpha})
+
+In this case, the error is calculated according to:
+
+![formula](https://render.githubusercontent.com/render/math?math=E=\cfrac{10^\frac{C_t-\beta}{\alpha}\ln{10}}{|\alpha|}\sqrt{\Delta%20C_t^2%2B\Delta\beta^2%2B(\frac{C_t-\beta}{\alpha}\Delta\alpha)^2})
 
 ### Linear data fit methods
 #### Least square method
