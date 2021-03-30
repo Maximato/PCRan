@@ -131,11 +131,11 @@ Where:
 ### Calculation of concentrations by Ct
 The known coefficients of the standard straight line make it possible to calculate the concentration of the sample from the known values of the threshold cycles. It should be borne in mind that in this case the same methods for determining Ct should be used both when constructing a standard straight line (estimating the coefficients α and β) and when determining the threshold cycle Ct of a sample.
 
-![formula](https://render.githubusercontent.com/render/math?math=E=10^\frac{C_t-\beta}{\alpha})
+![formula](https://render.githubusercontent.com/render/math?math=C_0=10^\frac{C_t-\beta}{\alpha})
 
 In this case, the error is calculated according to:
 
-![formula](https://render.githubusercontent.com/render/math?math=E=\cfrac{10^\frac{C_t-\beta}{\alpha}\ln{10}}{|\alpha|}\sqrt{\Delta%20C_t^2%2B\Delta\beta^2%2B(\frac{C_t-\beta}{\alpha}\Delta\alpha)^2})
+![formula](https://render.githubusercontent.com/render/math?math=\Delta%20C_0=\cfrac{10^\frac{C_t-\beta}{\alpha}\ln{10}}{|\alpha|}\sqrt{\Delta%20C_t^2%2B\Delta\beta^2%2B(\frac{C_t-\beta}{\alpha}\Delta\alpha)^2})
 
 ### Linear data fit methods
 #### Least square method
